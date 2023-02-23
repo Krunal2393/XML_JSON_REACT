@@ -1,40 +1,22 @@
 //1)LOCAL XML CALLS :-----------FETCH()
 
-//********************************************************** */
+//********************************************************* /
 //trying json data to fetch and het responce
 
 import React, { useEffect, useState } from "react";
 
 import axios from "axios";
-import { parseString } from "xml2js";
+import { parseString, Builder } from "xml2js";
 
 export default function User() {
   const [userData, setUserdata] = useState();
   const [xmlData, setXmlData] = useState({});
-  const [formData, setFormData] = useState({});
+  const [postData, setPostdata] = useState({});
 
   //making state of Array for get perticular value(like name,id) from parsed json data
   const [parsedDataArray, setParseddataarray] = useState([]);
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    fetch('http://127.0.0.1:8000/student', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        // Update the state with the response data
-        console.log(data);
-      });
-  };
 
-  const handleChange = (event) => {
-    setFormData({ ...formData, [event.target.name]: event.target.value });
-  };
-  const funA = () => {
+  const GetFakeJson = () => {
     fetch("https://jsonplaceholder.typicode.com/users")
       .then((response) => response.json())
       .then((json) => setUserdata(json))
@@ -42,7 +24,7 @@ export default function User() {
       .catch((error) => console.error(error));
   };
 
-  const funB = async () => {
+  const XmlToJson = async () => {
     const res = await axios.get("http://127.0.0.1:8000/student");
     console.log("XML_Typed_res ----> ", res.data);
 
@@ -64,13 +46,61 @@ export default function User() {
     });
   };
 
+  const JsonToXml = async (postData) => {
+    // const builder = new xml2js.Builder(); creates a new instance of the Builder class provided by the xml2js library.
+    // The Builder class is responsible for generating XML documents from JavaScript objects. It has various options
+    //  to control the output format, such as setting the root element name, specifying the encoding, defining namespaces, and more.
+    // Once you create a Builder instance, you can use its buildObject() method to convert a JavaScript object to an XML string.
+    //  The buildObject() method takes a single argument, which is the JavaScript object that you want to convert.
+    //inshort use Builder() to convert json data into xml
+    console.log("afterClickdata", postData, typeof postData);
+    const builder = new Builder();
+
+    const xmlStr = builder.buildObject(postData);
+
+    console.log("xmldata convert==========>", xmlStr);
+
+    const response = await fetch("http://127.0.0.1:8000/student", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      console.log("User created successfully!");
+    } else {
+      console.error("Error creating user:", response.statusText);
+    }
+
+
+    //this is AXIOS type code syntax
+    // try {
+    //   const response = await axios.post("http://127.0.0.1:8000/student", {
+    //     data: "example data",
+    //   });
+    //   console.log("typeofdata--->", response.data);
+    //   console.log(response.data);
+    // } catch (error) {
+    //   console.error(error);
+    // }
+  };
+
   useEffect(() => {
-    funA();
-    funB();
+    GetFakeJson();
+    XmlToJson();
   }, []);
 
+  const handleChange = (event) => {
+    setPostdata({
+      ...postData,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  console.log("Beforeclickdata===>", postData);
+
   return (
-    <>
     <div className="User_maindiv  bg-black ">
       <div>
         <div className="text-white">
@@ -131,23 +161,58 @@ export default function User() {
           </div>
         </div>
       </div>
+
+      <div>
+        <h1>Form</h1>
+        <label className="text-orange-500"> ID:</label>
+        <input
+          type="text"
+          name="id"
+          value={postData.id}
+          onChange={handleChange}
+          className="mt-7 "
+        />
+        <br />
+        <label className="text-orange-500"> STID:</label>
+        <input
+          type="text"
+          name="stid"
+          value={postData.stid}
+          onChange={handleChange}
+          className="mt-7 "
+        />
+        <br />
+
+        <label className="text-orange-500"> NAME:</label>
+        <input
+          type="text"
+          name="name"
+          value={postData.name}
+          onChange={handleChange}
+          className="mt-7"
+        />
+        <br />
+
+        <label className="text-orange-500"> COURSE:</label>
+        <input
+          type="text"
+          name="course"
+          value={postData.course}
+          onChange={handleChange}
+          className="mt-7"
+        />
+        <br />
+
+        <button
+          type="button"
+          className="bg-green-300 mt-7"
+          onClick={() => JsonToXml(postData)}
+        >
+          POST DATA
+        </button>
+      </div>
     </div>
-    <form onSubmit={handleSubmit}>
-      <label className="bg-white">
-        Name:
-        <input type="text" name="name" onChange={handleChange} />
-      </label>
-      <label className="bg-orange-800">
-        Email:
-        <input type="text" name="email" className="" onChange={handleChange} />
-      </label>
-      <button type="submit" className="bg-green-800">Add Data</button>
-    </form>
-
-    </>
-
   );
-  
 }
 //**************************************************************************************************************
 
