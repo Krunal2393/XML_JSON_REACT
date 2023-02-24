@@ -10,7 +10,7 @@ import { parseString, Builder } from "xml2js";
 
 export default function User() {
   const [userData, setUserdata] = useState();
-  const [xmlData, setXmlData] = useState({});
+  // const [xmlData, setXmlData] = useState({});
   const [postData, setPostdata] = useState({});
 
   //making state of Array for get perticular value(like name,id) from parsed json data
@@ -36,7 +36,7 @@ export default function User() {
 
       //take stringify json data into variable ->set finaldata into blank object state
       const FinalData = JSON.parse(data);
-      setXmlData(FinalData);
+    //  setXmlData(FinalData);
 
       //make variable ,assigned the value that we get from data
 
@@ -60,30 +60,43 @@ export default function User() {
 
     console.log("xmldata convert==========>", xmlStr);
 
-    const response = await fetch("http://127.0.0.1:8000/student", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    // const response = await fetch("http://127.0.0.1:8000/student", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/xml",
+    //     Accept:"*/*"
+    //   },
+    // });
 
-    if (response.ok) {
-      console.log("User created successfully!");
-    } else {
-      console.error("Error creating user:", response.statusText);
-    }
+    // if (response.ok) {
+    //   console.log("User created successfully!");
+    // } else {
+    //   console.error("Error creating user:", response.statusText);
+    // }
 
 
     //this is AXIOS type code syntax
-    // try {
-    //   const response = await axios.post("http://127.0.0.1:8000/student", {
-    //     data: "example data",
-    //   });
-    //   console.log("typeofdata--->", response.data);
-    //   console.log(response.data);
-    // } catch (error) {
-    //   console.error(error);
-    // }
+    try {
+      const response = await axios.post("http://127.0.0.1:8000/student", xmlStr,{
+        headers: {
+              "Content-Type": "application/xml",
+              Accept:"*/*"
+            },
+      });
+      console.log("typeofdata--->", response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const updateData = (data) => {
+    axios.put("http://127.0.0.1:8000/student", data)
+      .then(response => {
+        console.log(response.data); // Do something with the response data
+      })
+      .catch(error => {
+        console.error(error); // Handle any errors that occurred during the request
+      });
   };
 
   useEffect(() => {
@@ -145,13 +158,13 @@ export default function User() {
                     <hr />
                     <table>
                       <tr>
-                        <td>ID :{item.id}</td>
+                        <td>ID :<input value={item.id}></input></td>
                       </tr>
                       <tr>
-                        <td>Name :{item.name}</td>
+                        <td>Name :<input value={item.name}></input></td>
                       </tr>
                       <tr>
-                        <td>Course:{item.course}</td>
+                        <td>Course:<input value={item.course}></input></td>
                       </tr>
                     </table>
                   </div>
